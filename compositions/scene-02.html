@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <script src="assets/gsap.min.js"></script>
+  <style>
+    @font-face {
+      font-family: LabChinese;
+      src: url('assets/PingFang.ttc');
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #090a0f;
+      color: #f1f5f9;
+      font-family: LabChinese, -apple-system, sans-serif;
+      overflow: hidden;
+    }
+    .bg-wrap {
+      position: absolute;
+      inset: 0;
+      background: url('assets/images/scene02_jackie.jpg') center/cover no-repeat;
+      opacity: 0.32;
+      filter: brightness(0.7) contrast(1.2) saturate(1.1);
+    }
+    .bg-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 35%, rgba(6,8,13,0.3) 0%, rgba(5,6,9,0.92) 80%);
+    }
+    .ambient-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 90%, rgba(245, 158, 11, 0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Global Timeline Rail */
+    .timeline-rail {
+      position: absolute;
+      left: 70px;
+      right: 70px;
+      top: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 15;
+    }
+    .timeline-steps {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .timeline-node {
+      padding: 5px 12px;
+      border-radius: 18px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #64748b;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .timeline-node.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fcee0a;
+      border-color: #fcee0a;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+    .timeline-arrow {
+      color: #475569;
+      font-size: 13px;
+    }
+    .game-brand {
+      font-size: 16px;
+      color: #94a3b8;
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+
+    /* Hero Title Area */
+    .title-area {
+      position: absolute;
+      left: 70px;
+      right: 70px;
+      top: 86px;
+      z-index: 10;
+    }
+    .eyebrow-tag {
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+      color: #fcee0a;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .main-title {
+      font-size: 46px;
+      font-weight: 900;
+      line-height: 1.18;
+      margin: 0;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #ffffff 30%, #fcee0a 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 15px rgba(0,0,0,0.8));
+    }
+
+    /* Split Content */
+    .content-split {
+      position: absolute;
+      left: 70px;
+      right: 70px;
+      top: 195px;
+      bottom: 110px;
+      display: flex;
+      gap: 32px;
+      z-index: 10;
+    }
+
+    /* Left Column */
+    .logic-column {
+      flex: 1.15;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .logic-box {
+      background: rgba(16, 17, 26, 0.9);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 18px 22px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    .box-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .box-pill {
+      font-size: 13px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 6px;
+      letter-spacing: 1px;
+    }
+    .box-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: 1px;
+    }
+    .box-bullets {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .bullet-item {
+      font-size: 17px;
+      line-height: 1.45;
+      color: #cbd5e1;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .bullet-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-top: 9px;
+      flex-shrink: 0;
+    }
+
+    /* Right Column: Character / Scene Card */
+    .art-column {
+      flex: 0.85;
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 2px solid rgba(252, 238, 10, 0.4);
+      background: #0d111a;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.8);
+    }
+    .art-img-wrap {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .art-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    .art-gradient-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(6,8,13,0.1) 40%, rgba(6,8,13,0.95) 100%);
+    }
+    .art-info-overlay {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 22px;
+      z-index: 5;
+    }
+    .art-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid #fcee0a;
+      color: #fcee0a;
+      margin-bottom: 6px;
+    }
+    .art-name {
+      font-size: 30px;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 0 0 4px 0;
+      letter-spacing: 1.5px;
+      text-shadow: 0 3px 10px rgba(0,0,0,0.8);
+    }
+    .art-desc {
+      font-size: 16px;
+      color: #cbd5e1;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    /* Bottom Floating Subtitle (No Progress Bar!) */
+    .caption-container {
+      position: absolute;
+      left: 70px;
+      right: 70px;
+      bottom: 24px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 25;
+    }
+    .caption-box {
+      position: absolute;
+      background: rgba(8, 11, 18, 0.94);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(252, 238, 10, 0.4);
+      padding: 12px 40px;
+      border-radius: 36px;
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.85);
+      text-align: center;
+      white-space: nowrap;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root" data-composition-id="scene-02" data-start="0" data-duration="36.99" data-width="1920" data-height="1080">
+    <div class="bg-wrap">
+      <div class="bg-overlay"></div>
+      <div class="ambient-glow"></div>
+    </div>
+
+    <!-- Timeline Rail -->
+    <div class="timeline-rail">
+      <div class="timeline-steps">
+        <div class="timeline-node">01 底色与前因</div><span class="timeline-arrow">➔</span><div class="timeline-node active">02 转折大劫案</div><span class="timeline-arrow">➔</span><div class="timeline-node">03 生死危机</div><span class="timeline-arrow">➔</span><div class="timeline-node">04 突破高墙</div><span class="timeline-arrow">➔</span><div class="timeline-node">05 巅峰决战</div><span class="timeline-arrow">➔</span><div class="timeline-node">06 终局抉择</div>
+      </div>
+      <div class="game-brand">CYBERPUNK 2077 / 赛博科幻悲歌</div>
+    </div>
+
+    <!-- Hero Title -->
+    <div class="title-area">
+      <div class="eyebrow-tag">TIMELINE 02 / THE HEIST AT KONPEKI PLAZA</div>
+      <h1 class="main-title">转折大劫案 · 绀碧大厦与血泊突围</h1>
+    </div>
+
+    <!-- Split Content -->
+    <div class="content-split">
+      <div class="logic-column">
+        
+              <div class="logic-box" id="lbox-1">
+                <div class="box-header">
+                  <span class="box-pill" style="background: rgba(0, 240, 255, 0.18); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.4);">【潜入盗宝】</span>
+                  <span class="box-title">得手荒坂绝密Relic</span>
+                </div>
+                <div class="box-bullets">
+                  
+                  <div class="bullet-item">
+                    <span class="bullet-dot" style="background: #00f0ff;"></span>
+                    <span>顺利潜入五星级绀碧大厦，取得意识复制芯片</span>
+                  </div>
+                
+                  <div class="bullet-item">
+                    <span class="bullet-dot" style="background: #00f0ff;"></span>
+                    <span>本以为即将一飞冲天跨入夜之城顶级传奇行列</span>
+                  </div>
+                
+                </div>
+              </div>
+            
+              <div class="logic-box" id="lbox-2">
+                <div class="box-header">
+                  <span class="box-pill" style="background: rgba(255, 0, 60, 0.18); color: #ff003c; border: 1px solid rgba(255, 0, 60, 0.4);">【弑父血案】</span>
+                  <span class="box-title">意外撞破皇室内乱</span>
+                </div>
+                <div class="box-bullets">
+                  
+                  <div class="bullet-item">
+                    <span class="bullet-dot" style="background: #ff003c;"></span>
+                    <span>荒坂赖宣亲手掐死父亲荒坂三郎，嫁祸外来杀手</span>
+                  </div>
+                
+                  <div class="bullet-item">
+                    <span class="bullet-dot" style="background: #ff003c;"></span>
+                    <span>最高警报拉响，机甲部队全城地毯式封锁追杀</span>
+                  </div>
+                
+                </div>
+              </div>
+            
+              <div class="logic-box" id="lbox-3">
+                <div class="box-header">
+                  <span class="box-pill" style="background: rgba(252, 238, 10, 0.18); color: #fcee0a; border: 1px solid rgba(252, 238, 10, 0.4);">【兄弟陨落】</span>
+                  <span class="box-title">杰克牺牲与绝境爆头</span>
+                </div>
+                <div class="box-bullets">
+                  
+                  <div class="bullet-item">
+                    <span class="bullet-dot" style="background: #fcee0a;"></span>
+                    <span>杰克重伤不治，在出租车里将芯片托付给V后闭眼</span>
+                  </div>
+                
+                  <div class="bullet-item">
+                    <span class="bullet-dot" style="background: #fcee0a;"></span>
+                    <span>中间人德克斯特过河拆桥，一枪将V爆头弃尸垃圾场</span>
+                  </div>
+                
+                </div>
+              </div>
+            
+      </div>
+
+      <div class="art-column">
+        <div class="art-img-wrap">
+          <img src="assets/images/scene02_jackie.jpg" class="art-img" data-layout-allow-overflow data-duration="36.99" alt="杰克·威尔斯" />
+          <div class="art-gradient-overlay"></div>
+          <div class="art-info-overlay">
+            <span class="art-badge">一生兄弟</span>
+            <h2 class="art-name">杰克·威尔斯</h2>
+            <p class="art-desc">海伍德最重情义的硬汉，倒在德拉曼出租车的后座血泊中。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subtitle Container -->
+    <div class="caption-container">
+      <div class="caption-box" id="caption-0" style="opacity: 0;">转折点正是那场名垂青史的“绀碧大厦大劫案”</div><div class="caption-box" id="caption-1" style="opacity: 0;">V和杰克完美黑入顶层套房</div><div class="caption-box" id="caption-2" style="opacity: 0;">成功拿到了荒坂最核心的机密——能够储存意识人格的Relic生物芯片</div><div class="caption-box" id="caption-3" style="opacity: 0;">然而倒霉透顶的是</div><div class="caption-box" id="caption-4" style="opacity: 0;">荒坂帝国的皇帝三郎突然空降</div><div class="caption-box" id="caption-5" style="opacity: 0;">随后更发生弑父惨剧：少主赖宣亲手掐死了老爹</div><div class="caption-box" id="caption-6" style="opacity: 0;">全城封锁</div><div class="caption-box" id="caption-7" style="opacity: 0;">突围中杰克中弹牺牲</div><div class="caption-box" id="caption-8" style="opacity: 0;">死前把芯片插进V的脑后</div><div class="caption-box" id="caption-9" style="opacity: 0;">更恶心的是</div><div class="caption-box" id="caption-10" style="opacity: 0;">幕后老板德克斯特为求自保</div><div class="caption-box" id="caption-11" style="opacity: 0;">直接在汽车旅馆一枪爆了V的头</div>
+    </div>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    window.__timelines['scene-02'] = tl;
+
+    // Entrance
+    tl.from('.title-area', { y: -30, opacity: 0, duration: 0.8, ease: 'power3.out' }, 0.1);
+    tl.from('.logic-box', { x: -40, opacity: 0, duration: 0.7, stagger: 0.15, ease: 'power2.out' }, 0.3);
+    tl.from('.art-column', { scale: 0.95, opacity: 0, duration: 0.9, ease: 'back.out(1.2)' }, 0.4);
+
+    // Subtitles sequence
+    const clauseDur = 2.92;
+    
+    tl.to('#caption-0', { opacity: 1, y: 0, duration: 0.3 }, 0.50);
+    tl.to('#caption-0', { opacity: 0, y: -10, duration: 0.25 }, 3.32);
+    
+
+    tl.to('#caption-1', { opacity: 1, y: 0, duration: 0.3 }, 3.42);
+    tl.to('#caption-1', { opacity: 0, y: -10, duration: 0.25 }, 6.23);
+    
+
+    tl.to('#caption-2', { opacity: 1, y: 0, duration: 0.3 }, 6.33);
+    tl.to('#caption-2', { opacity: 0, y: -10, duration: 0.25 }, 9.15);
+    
+
+    tl.to('#caption-3', { opacity: 1, y: 0, duration: 0.3 }, 9.25);
+    tl.to('#caption-3', { opacity: 0, y: -10, duration: 0.25 }, 12.06);
+    
+
+    tl.to('#caption-4', { opacity: 1, y: 0, duration: 0.3 }, 12.16);
+    tl.to('#caption-4', { opacity: 0, y: -10, duration: 0.25 }, 14.98);
+    
+
+    tl.to('#caption-5', { opacity: 1, y: 0, duration: 0.3 }, 15.08);
+    tl.to('#caption-5', { opacity: 0, y: -10, duration: 0.25 }, 17.89);
+    
+
+    tl.to('#caption-6', { opacity: 1, y: 0, duration: 0.3 }, 18.00);
+    tl.to('#caption-6', { opacity: 0, y: -10, duration: 0.25 }, 20.81);
+    
+
+    tl.to('#caption-7', { opacity: 1, y: 0, duration: 0.3 }, 20.91);
+    tl.to('#caption-7', { opacity: 0, y: -10, duration: 0.25 }, 23.73);
+    
+
+    tl.to('#caption-8', { opacity: 1, y: 0, duration: 0.3 }, 23.83);
+    tl.to('#caption-8', { opacity: 0, y: -10, duration: 0.25 }, 26.64);
+    
+
+    tl.to('#caption-9', { opacity: 1, y: 0, duration: 0.3 }, 26.74);
+    tl.to('#caption-9', { opacity: 0, y: -10, duration: 0.25 }, 29.56);
+    
+
+    tl.to('#caption-10', { opacity: 1, y: 0, duration: 0.3 }, 29.66);
+    tl.to('#caption-10', { opacity: 0, y: -10, duration: 0.25 }, 32.47);
+    
+
+    tl.to('#caption-11', { opacity: 1, y: 0, duration: 0.3 }, 32.57);
+    tl.to('#caption-11', { opacity: 0, y: -10, duration: 0.25 }, 35.39);
+    
+
+    // Keep active until end
+    tl.to({}, { duration: 36.99 }, 0);
+  </script>
+</body>
+</html>

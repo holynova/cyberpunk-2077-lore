@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <script src="assets/gsap.min.js"></script>
+  <style>
+    @font-face {
+      font-family: LabChinese;
+      src: url('assets/PingFang.ttc');
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    #root {
+      position: absolute;
+      inset: 0;
+      background: #090a0f;
+      color: #f1f5f9;
+      font-family: LabChinese, -apple-system, sans-serif;
+      overflow: hidden;
+    }
+    .bg-wrap {
+      position: absolute;
+      inset: 0;
+      background: url('assets/images/scene01_v.jpg') center/cover no-repeat;
+      opacity: 0.32;
+      filter: brightness(0.7) contrast(1.2) saturate(1.1);
+    }
+    .bg-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 35%, rgba(6,8,13,0.3) 0%, rgba(5,6,9,0.92) 80%);
+    }
+    .ambient-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 90%, rgba(245, 158, 11, 0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* Global Timeline Rail */
+    .timeline-rail {
+      position: absolute;
+      left: 70px;
+      right: 70px;
+      top: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 15;
+    }
+    .timeline-steps {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .timeline-node {
+      padding: 5px 12px;
+      border-radius: 18px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: rgba(255, 255, 255, 0.06);
+      color: #64748b;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .timeline-node.active {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fcee0a;
+      border-color: #fcee0a;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    }
+    .timeline-arrow {
+      color: #475569;
+      font-size: 13px;
+    }
+    .game-brand {
+      font-size: 16px;
+      color: #94a3b8;
+      letter-spacing: 2px;
+      font-weight: 700;
+    }
+
+    /* Hero Title Area */
+    .title-area {
+      position: absolute;
+      left: 70px;
+      right: 70px;
+      top: 86px;
+      z-index: 10;
+    }
+    .eyebrow-tag {
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 2.5px;
+      color: #fcee0a;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .main-title {
+      font-size: 46px;
+      font-weight: 900;
+      line-height: 1.18;
+      margin: 0;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #ffffff 30%, #fcee0a 90%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 15px rgba(0,0,0,0.8));
+    }
+
+    /* Split Content */
+    .content-split {
+      position: absolute;
+      left: 70px;
+      right: 70px;
+      top: 195px;
+      bottom: 110px;
+      display: flex;
+      gap: 32px;
+      z-index: 10;
+    }
+
+    /* Left Column */
+    .logic-column {
+      flex: 1.15;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .logic-box {
+      background: rgba(16, 17, 26, 0.9);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 18px 22px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    .box-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .box-pill {
+      font-size: 13px;
+      font-weight: 800;
+      padding: 3px 9px;
+      border-radius: 6px;
+      letter-spacing: 1px;
+    }
+    .box-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: 1px;
+    }
+    .box-bullets {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .bullet-item {
+      font-size: 17px;
+      line-height: 1.45;
+      color: #cbd5e1;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .bullet-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      margin-top: 9px;
+      flex-shrink: 0;
+    }
+
+    /* Right Column: Character / Scene Card */
+    .art-column {
+      flex: 0.85;
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 2px solid rgba(252, 238, 10, 0.4);
+      background: #0d111a;
+      box-shadow: 0 20px 45px rgba(0,0,0,0.8);
+    }
+    .art-img-wrap {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+    .art-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+    .art-gradient-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(6,8,13,0.1) 40%, rgba(6,8,13,0.95) 100%);
+    }
+    .art-info-overlay {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 22px;
+      z-index: 5;
+    }
+    .art-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid #fcee0a;
+      color: #fcee0a;
+      margin-bottom: 6px;
+    }
+    .art-name {
+      font-size: 30px;
+      font-weight: 900;
+      color: #ffffff;
+      margin: 0 0 4px 0;
+      letter-spacing: 1.5px;
+      text-shadow: 0 3px 10px rgba(0,0,0,0.8);
+    }
+    .art-desc {
+      font-size: 16px;
+      color: #cbd5e1;
+      line-height: 1.4;
+      margin: 0;
+    }
+
+    /* Bottom Floating Subtitle (No Progress Bar!) */
+    .caption-container {
+      position: absolute;
+      left: 70px;
+      right: 70px;
+      bottom: 24px;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 25;
+    }
+    .caption-box {
+      position: absolute;
+      background: rgba(8, 11, 18, 0.94);
+      backdrop-filter: blur(16px);
+      border: 1.5px solid rgba(252, 238, 10, 0.4);
+      padding: 12px 40px;
+      border-radius: 36px;
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.85);
+      text-align: center;
+      white-space: nowrap;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root" data-composition-id="scene-04" data-start="0" data-duration="34.09" data-width="1920" data-height="1080">
+    <div class="bg-wrap">
+      <div class="bg-overlay"></div>
+      <div class="ambient-glow"></div>
+    </div>
+
+    <!-- Timeline Rail -->
+    <div class="timeline-rail">
+      <div class="timeline-steps">
+        <div class="timeline-node">01 底色与前因</div><span class="timeline-arrow">➔</span><div class="timeline-node">02 转折大劫案</div><span class="timeline-arrow">➔</span><div class="timeline-node">03 生死危机</div><span class="timeline-arrow">➔</span><div class="timeline-node active">04 突破高墙</div><span class="timeline-arrow">➔</span><div class="timeline-node">05 巅峰决战</div><span class="timeline-arrow">➔</span><div class="timeline-node">06 终局抉择</div>
+      </div>
+      <div class="game-brand">CYBERPUNK 2077 / 赛博科幻悲歌</div>
+    </div>
+
+    <!-- Hero Title -->
+    <div class="title-area">
+      <div class="eyebrow-tag">TIMELINE 04 / BEYOND THE BLACKWALL</div>
+      <h1 class="main-title">突破高墙 · 游荡恶土与黑墙奥特</h1>
+    </div>
+
+    <!-- Split Content -->
+    <div class="content-split">
+      <div class="logic-column">
+        
+              <div class="logic-box" id="lbox-1">
+                <div class="box-header">
+                  <span class="box-pill" style="background: rgba(0, 240, 255, 0.18); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.4);">【踏平夜城】</span>
+                  <span class="box-title">结识生死与共的真挚盟友</span>
+                </div>
+                <div class="box-bullets">
+                  
+                  <div class="bullet-item">
+                    <span class="bullet-dot" style="background: #00f0ff;"></span>
+                    <span>与恶土流浪者阿德卡多家族结下生死兄弟情义</span>
+                  </div>
+                
+                  <div class="bullet-item">
+                    <span class="bullet-dot" style="background: #00f0ff;"></span>
+                    <span>携手竹村调查荒坂游行，一步步逼近核心机密</span>
+                  </div>
+                
+                </div>
+              </div>
+            
+              <div class="logic-box" id="lbox-2">
+                <div class="box-header">
+                  <span class="box-pill" style="background: rgba(252, 238, 10, 0.18); color: #fcee0a; border: 1px solid rgba(252, 238, 10, 0.4);">【接触神明】</span>
+                  <span class="box-title">突破赛博禁区连线奥特</span>
+                </div>
+                <div class="box-bullets">
+                  
+                  <div class="bullet-item">
+                    <span class="bullet-dot" style="background: #fcee0a;"></span>
+                    <span>借助巫毒帮潜入深网，跨越黑墙联络AI奥特</span>
+                  </div>
+                
+                  <div class="bullet-item">
+                    <span class="bullet-dot" style="background: #fcee0a;"></span>
+                    <span>得知Relic核心解法：唯有神舆才能剥离双重意识</span>
+                  </div>
+                
+                </div>
+              </div>
+            
+              <div class="logic-box" id="lbox-3">
+                <div class="box-header">
+                  <span class="box-pill" style="background: rgba(255, 0, 60, 0.18); color: #ff003c; border: 1px solid rgba(255, 0, 60, 0.4);">【决战倒计时】</span>
+                  <span class="box-title">夜之城最后的狂风暴雨</span>
+                </div>
+                <div class="box-bullets">
+                  
+                  <div class="bullet-item">
+                    <span class="bullet-dot" style="background: #ff003c;"></span>
+                    <span>常规医疗宣告无效，身体机能逼近崩溃奇点</span>
+                  </div>
+                
+                  <div class="bullet-item">
+                    <span class="bullet-dot" style="background: #ff003c;"></span>
+                    <span>吹响总攻号角，准备向荒坂塔发起自杀式突袭！</span>
+                  </div>
+                
+                </div>
+              </div>
+            
+      </div>
+
+      <div class="art-column">
+        <div class="art-img-wrap">
+          <img src="assets/images/scene01_v.jpg" class="art-img" data-layout-allow-overflow data-duration="34.09" alt="流浪者 帕南 & 奥特" />
+          <div class="art-gradient-overlay"></div>
+          <div class="art-info-overlay">
+            <span class="art-badge">盟友与黑客</span>
+            <h2 class="art-name">流浪者 帕南 & 奥特</h2>
+            <p class="art-desc">恶土阿德卡多的越野重机枪，与黑墙之外化身神明的超强AI。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subtitle Container -->
+    <div class="caption-container">
+      <div class="caption-box" id="caption-0" style="opacity: 0;">为了自救</div><div class="caption-box" id="caption-1" style="opacity: 0;">V踏遍了夜之城的三教九流</div><div class="caption-box" id="caption-2" style="opacity: 0;">联手朱迪追查云顶</div><div class="caption-box" id="caption-3" style="opacity: 0;">求助流浪者帕南用EMP干下荒坂浮空车抓捕赫尔曼</div><div class="caption-box" id="caption-4" style="opacity: 0;">再跟着竹村密谋揭穿赖宣的谎言</div><div class="caption-box" id="caption-5" style="opacity: 0;">最终的线索指向了赛博空间的绝对禁区——黑墙之外</div><div class="caption-box" id="caption-6" style="opacity: 0;">强尼的前女友奥特·坎宁安已经进化成了神级AI</div><div class="caption-box" id="caption-7" style="opacity: 0;">她给出了唯一的药方：杀入荒坂塔地下的数据殿堂“神舆”</div><div class="caption-box" id="caption-8" style="opacity: 0;">用奥特的代码把V和强尼的意识彻底剥离</div>
+    </div>
+  </div>
+
+  <script>
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    window.__timelines['scene-04'] = tl;
+
+    // Entrance
+    tl.from('.title-area', { y: -30, opacity: 0, duration: 0.8, ease: 'power3.out' }, 0.1);
+    tl.from('.logic-box', { x: -40, opacity: 0, duration: 0.7, stagger: 0.15, ease: 'power2.out' }, 0.3);
+    tl.from('.art-column', { scale: 0.95, opacity: 0, duration: 0.9, ease: 'back.out(1.2)' }, 0.4);
+
+    // Subtitles sequence
+    const clauseDur = 3.57;
+    
+    tl.to('#caption-0', { opacity: 1, y: 0, duration: 0.3 }, 0.50);
+    tl.to('#caption-0', { opacity: 0, y: -10, duration: 0.25 }, 3.97);
+    
+
+    tl.to('#caption-1', { opacity: 1, y: 0, duration: 0.3 }, 4.07);
+    tl.to('#caption-1', { opacity: 0, y: -10, duration: 0.25 }, 7.53);
+    
+
+    tl.to('#caption-2', { opacity: 1, y: 0, duration: 0.3 }, 7.63);
+    tl.to('#caption-2', { opacity: 0, y: -10, duration: 0.25 }, 11.10);
+    
+
+    tl.to('#caption-3', { opacity: 1, y: 0, duration: 0.3 }, 11.20);
+    tl.to('#caption-3', { opacity: 0, y: -10, duration: 0.25 }, 14.66);
+    
+
+    tl.to('#caption-4', { opacity: 1, y: 0, duration: 0.3 }, 14.76);
+    tl.to('#caption-4', { opacity: 0, y: -10, duration: 0.25 }, 18.23);
+    
+
+    tl.to('#caption-5', { opacity: 1, y: 0, duration: 0.3 }, 18.33);
+    tl.to('#caption-5', { opacity: 0, y: -10, duration: 0.25 }, 21.79);
+    
+
+    tl.to('#caption-6', { opacity: 1, y: 0, duration: 0.3 }, 21.89);
+    tl.to('#caption-6', { opacity: 0, y: -10, duration: 0.25 }, 25.36);
+    
+
+    tl.to('#caption-7', { opacity: 1, y: 0, duration: 0.3 }, 25.46);
+    tl.to('#caption-7', { opacity: 0, y: -10, duration: 0.25 }, 28.92);
+    
+
+    tl.to('#caption-8', { opacity: 1, y: 0, duration: 0.3 }, 29.02);
+    tl.to('#caption-8', { opacity: 0, y: -10, duration: 0.25 }, 32.49);
+    
+
+    // Keep active until end
+    tl.to({}, { duration: 34.09 }, 0);
+  </script>
+</body>
+</html>

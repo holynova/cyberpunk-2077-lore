@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>赛博朋克2077：夜之城绞肉机与向死而生 | Hyperframe 史诗剧情解析</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090a0f;
+      --bg-card: rgba(16, 17, 26, 0.9);
+      --border-color: rgba(252, 238, 10, 0.4);
+      --accent: #fcee0a;
+      --accent-sec: #00f0ff;
+      --accent-alert: #ff003c;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Noto Serif SC', -apple-system, BlinkMacSystemFont, "PingFang SC", serif;
+      line-height: 1.6;
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
+    .series-nav-bar {
+      background: rgba(10, 14, 22, 0.95);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px 20px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .series-link {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 5px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.2s;
+    }
+    .series-link:hover, .series-link.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
+    .hero-banner {
+      padding: 50px 20px 24px;
+      text-align: center;
+    }
+    .badge-top {
+      display: inline-block;
+      padding: 5px 18px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 13px;
+      letter-spacing: 2.5px;
+      margin-bottom: 16px;
+      font-weight: 800;
+    }
+    .main-title {
+      font-size: clamp(30px, 4.5vw, 52px);
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      line-height: 1.25;
+      margin-bottom: 14px;
+      background: linear-gradient(135deg, #ffffff 30%, var(--accent) 95%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      font-size: clamp(15px, 1.8vw, 19px);
+      color: var(--text-muted);
+      max-width: 840px;
+      margin: 0 auto 28px;
+    }
+    .tag-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+    .spec-tag {
+      padding: 5px 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+    .spec-tag b { color: var(--accent); }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+    .video-box {
+      background: #000;
+      border: 1.5px solid var(--border-color);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.85);
+      margin-bottom: 30px;
+    }
+    .video-wrapper {
+      position: relative;
+      padding-top: 56.25%;
+    }
+    .video-wrapper video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    .player-quickbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 20px;
+      background: rgba(15, 20, 30, 0.95);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .current-chapter-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+    }
+    .indicator-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.8); opacity: 0.5; }
+    }
+    .current-chapter-name { color: var(--accent); font-weight: 700; }
+    .playback-tools { display: flex; gap: 8px; }
+    .speed-btn {
+      padding: 4px 12px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #cbd5e1;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .speed-btn.active {
+      background: var(--accent);
+      color: #000;
+      font-weight: 700;
+      border-color: var(--accent);
+    }
+
+    /* Interactive Timeline Nav */
+    .timeline-nav-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 45px;
+    }
+    .timeline-nav-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+    .timeline-nav-card:hover, .timeline-nav-card.active {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .tn-index {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--accent);
+    }
+    .tn-info { flex: 1; overflow: hidden; }
+    .tn-title {
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #f1f5f9;
+    }
+    .tn-time { font-size: 11px; color: #64748b; }
+
+    /* Section Headings */
+    .section-title {
+      font-size: 26px;
+      font-weight: 900;
+      margin: 40px 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 24px;
+      background: var(--accent);
+      border-radius: 2px;
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    /* Causal Cards List */
+    .causal-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-bottom: 45px;
+    }
+    .causal-scene-card {
+      background: var(--bg-card);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      transition: all 0.25s;
+    }
+    .causal-scene-card:hover {
+      border-color: var(--accent);
+    }
+    .csc-header { margin-bottom: 18px; }
+    .csc-meta { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; }
+    .csc-step {
+      font-size: 12px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: rgba(255,255,255,0.1);
+      color: var(--accent);
+    }
+    .csc-time-tag { font-size: 12px; color: #64748b; }
+    .csc-title { font-size: 22px; font-weight: 900; color: #f8fafc; margin-bottom: 8px; }
+    .csc-narration { font-size: 15px; color: var(--text-muted); font-style: italic; line-height: 1.5; }
+    .csc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+    .causal-box {
+      background: rgba(8, 12, 18, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+    .c-pill {
+      font-size: 12px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .c-title { font-size: 17px; font-weight: 800; color: #ffffff; margin-bottom: 8px; }
+    .c-bullets { list-style: none; padding-left: 0; }
+    .c-bullets li {
+      font-size: 14px;
+      color: #cbd5e1;
+      margin-bottom: 5px;
+      position: relative;
+      padding-left: 14px;
+    }
+    .c-bullets li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    /* Character Dossier */
+    .char-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 60px;
+    }
+    .char-card {
+      background: var(--bg-card);
+      border: 1.5px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.25s;
+    }
+    .char-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+    .char-img-wrap {
+      position: relative;
+      height: 220px;
+      overflow: hidden;
+    }
+    .char-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .char-badge {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(0,0,0,0.8);
+      border: 1px solid;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .char-body { padding: 18px 20px; }
+    .char-name { font-size: 20px; font-weight: 900; color: #ffffff; margin-bottom: 6px; }
+    .char-desc { font-size: 14px; color: var(--text-muted); line-height: 1.45; }
+
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      color: #64748b;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Global Series Bar -->
+  <div class="series-nav-bar">
+    <a href="https://holynova.github.io/elden-ring-lore/" class="series-link">艾尔登法环</a><a href="https://holynova.github.io/cyberpunk-2077-lore/" class="series-link active">赛博朋克2077</a><a href="https://holynova.github.io/rdr2-lore/" class="series-link">荒野大镖客2</a><a href="https://holynova.github.io/gta5-lore/" class="series-link">GTA5</a><a href="https://holynova.github.io/witcher-3-lore/" class="series-link">巫师三</a><a href="https://holynova.github.io/dark-souls-3-lore/" class="series-link">黑暗之魂3</a>
+  </div>
+
+  <!-- Hero Header -->
+  <header class="hero-banner">
+    <div class="badge-top">CYBERPUNK 2077 / 赛博科幻悲歌</div>
+    <h1 class="main-title">赛博朋克2077：夜之城绞肉机与向死而生</h1>
+    <p class="subtitle">从底层佣兵大劫案、Relic生死倒计时，到单挑荒坂塔与赛博空间抉择</p>
+    <div class="tag-container">
+      <div class="spec-tag">视频规格：<b>1080P 60FPS 超清</b></div>
+      <div class="spec-tag">音频体验：<b>双声道定制氛围 BGM</b></div>
+      <div class="spec-tag">叙事风格：<b>慷慨激昂 / 说人话因果闭环</b></div>
+      <div class="spec-tag">视觉呈现：<b>极简大字 / 严密时间线 / 绝对无进度条</b></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Cinema Video Box -->
+    <div class="video-box">
+      <div class="video-wrapper">
+        <video id="mainVideo" controls poster="assets/images/hero_v.jpg">
+          <source src="cyberpunk-2077_lore.mp4" type="video/mp4">
+          您的浏览器暂不支持 HTML5 视频播放。
+        </video>
+      </div>
+      <div class="player-quickbar">
+        <div class="current-chapter-display">
+          <div class="indicator-dot"></div>
+          <span>当前解析：<b class="current-chapter-name" id="curChapterName">底色与前因 · 巨企绞肉机与扬名立万</b></span>
+        </div>
+        <div class="playback-tools">
+          <button class="speed-btn active" onclick="setSpeed(1.0, this)">1.0x</button>
+          <button class="speed-btn" onclick="setSpeed(1.25, this)">1.25x</button>
+          <button class="speed-btn" onclick="setSpeed(1.5, this)">1.5x</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline Nav Bar -->
+    <div class="timeline-nav-grid">
+      
+          <div class="timeline-nav-card" onclick="jumpToChapter(0.0, 1)">
+            <div class="tn-index">01</div>
+            <div class="tn-info">
+              <div class="tn-title">底色与前因 · 巨企绞肉机与扬名立万</div>
+              <div class="tn-time">00:00</div>
+            </div>
+          </div>
+        
+          <div class="timeline-nav-card" onclick="jumpToChapter(36.4, 2)">
+            <div class="tn-index">02</div>
+            <div class="tn-info">
+              <div class="tn-title">转折大劫案 · 绀碧大厦与血泊突围</div>
+              <div class="tn-time">00:36</div>
+            </div>
+          </div>
+        
+          <div class="timeline-nav-card" onclick="jumpToChapter(73.4, 3)">
+            <div class="tn-index">03</div>
+            <div class="tn-info">
+              <div class="tn-title">生死危机 · 强尼银手与神经覆写</div>
+              <div class="tn-time">01:13</div>
+            </div>
+          </div>
+        
+          <div class="timeline-nav-card" onclick="jumpToChapter(108.6, 4)">
+            <div class="tn-index">04</div>
+            <div class="tn-info">
+              <div class="tn-title">突破高墙 · 游荡恶土与黑墙奥特</div>
+              <div class="tn-time">01:48</div>
+            </div>
+          </div>
+        
+          <div class="timeline-nav-card" onclick="jumpToChapter(142.7, 5)">
+            <div class="tn-index">05</div>
+            <div class="tn-info">
+              <div class="tn-title">巅峰决战 · 杀穿荒坂塔与手刃重锤</div>
+              <div class="tn-time">02:22</div>
+            </div>
+          </div>
+        
+          <div class="timeline-nav-card" onclick="jumpToChapter(178.3, 6)">
+            <div class="tn-index">06</div>
+            <div class="tn-info">
+              <div class="tn-title">终局抉择 · 神舆赛博空间与传奇谢幕</div>
+              <div class="tn-time">02:58</div>
+            </div>
+          </div>
+        
+    </div>
+
+    <!-- Section 1: Causal Logic Full Map -->
+    <h2 class="section-title">六幕剧情前因后果全景因果链</h2>
+    <div class="causal-list">
+      
+          <div class="causal-scene-card" id="scene-card-1">
+            <div class="csc-header">
+              <div class="csc-meta">
+                <span class="csc-step">STAGE 01</span>
+                <span class="csc-time-tag">00:00</span>
+              </div>
+              <h3 class="csc-title">底色与前因 · 巨企绞肉机与扬名立万</h3>
+              <p class="csc-narration">"打赛博朋克2077千万别被炫酷的霓虹灯晃花了眼，它的内核是一出冰冷刺骨的社会悲剧！故事的大前因，是荒坂和军用科技等巨型企业垄断了一切，把夜之城变成了一台冷酷的绞肉机！普通人连呼吸都要交钱，底层雇佣兵只有两条路：要么像阴沟老鼠一样苟活到老，要么干一票惊天动地的大案、燃烧自己成为来生酒吧的一杯烈酒！主角V与好兄弟杰克，毫不犹豫地选择了后者！"</p>
+            </div>
+            <div class="csc-grid">
+              
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(255, 0, 60, 0.16); color: #ff003c;">【巨企专制】</span>
+                <h4 class="c-title">垄断一切的残酷体制</h4>
+                <ul class="c-bullets">
+                  <li>荒坂与军工寡头凌驾于政府之上，法律沦为私产</li><li>底层民众无路可走，义体化与神经病泛滥</li>
+                </ul>
+              </div>
+            
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(252, 238, 10, 0.16); color: #fcee0a;">【佣兵信条】</span>
+                <h4 class="c-title">来生酒吧的永恒法则</h4>
+                <ul class="c-bullets">
+                  <li>要么籍籍无名安享晚年，要么轰轰烈烈名垂青史</li><li>死后唯有一款以自己命名的鸡尾酒能证明存在</li>
+                </ul>
+              </div>
+            
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(0, 240, 255, 0.16); color: #00f0ff;">【致命豪赌】</span>
+                <h4 class="c-title">接下改变命运的超级委托</h4>
+                <ul class="c-bullets">
+                  <li>中介人德克斯特抛出橄榄枝：潜入荒坂偷取最高机密</li><li>一趟看似通往财富顶峰、实则步入深渊的绝命之旅</li>
+                </ul>
+              </div>
+            
+            </div>
+          </div>
+        
+          <div class="causal-scene-card" id="scene-card-2">
+            <div class="csc-header">
+              <div class="csc-meta">
+                <span class="csc-step">STAGE 02</span>
+                <span class="csc-time-tag">00:36</span>
+              </div>
+              <h3 class="csc-title">转折大劫案 · 绀碧大厦与血泊突围</h3>
+              <p class="csc-narration">"转折点正是那场名垂青史的“绀碧大厦大劫案”！V和杰克完美黑入顶层套房，成功拿到了荒坂最核心的机密——能够储存意识人格的Relic生物芯片！然而倒霉透顶的是，荒坂帝国的皇帝三郎突然空降，随后更发生弑父惨剧：少主赖宣亲手掐死了老爹，全城封锁！突围中杰克中弹牺牲，死前把芯片插进V的脑后。更恶心的是，幕后老板德克斯特为求自保，直接在汽车旅馆一枪爆了V的头！"</p>
+            </div>
+            <div class="csc-grid">
+              
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(0, 240, 255, 0.16); color: #00f0ff;">【潜入盗宝】</span>
+                <h4 class="c-title">得手荒坂绝密Relic</h4>
+                <ul class="c-bullets">
+                  <li>顺利潜入五星级绀碧大厦，取得意识复制芯片</li><li>本以为即将一飞冲天跨入夜之城顶级传奇行列</li>
+                </ul>
+              </div>
+            
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(255, 0, 60, 0.16); color: #ff003c;">【弑父血案】</span>
+                <h4 class="c-title">意外撞破皇室内乱</h4>
+                <ul class="c-bullets">
+                  <li>荒坂赖宣亲手掐死父亲荒坂三郎，嫁祸外来杀手</li><li>最高警报拉响，机甲部队全城地毯式封锁追杀</li>
+                </ul>
+              </div>
+            
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(252, 238, 10, 0.16); color: #fcee0a;">【兄弟陨落】</span>
+                <h4 class="c-title">杰克牺牲与绝境爆头</h4>
+                <ul class="c-bullets">
+                  <li>杰克重伤不治，在出租车里将芯片托付给V后闭眼</li><li>中间人德克斯特过河拆桥，一枪将V爆头弃尸垃圾场</li>
+                </ul>
+              </div>
+            
+            </div>
+          </div>
+        
+          <div class="causal-scene-card" id="scene-card-3">
+            <div class="csc-header">
+              <div class="csc-meta">
+                <span class="csc-step">STAGE 03</span>
+                <span class="csc-time-tag">01:13</span>
+              </div>
+              <h3 class="csc-title">生死危机 · 强尼银手与神经覆写</h3>
+              <p class="csc-narration">"然而V并没有死！Relic芯片内部受损启动自检修复，强行激活了脑细胞，但副作用是：芯片里封存的五十年前反抗企业的老派摇滚乐手——强尼·银手的意识被彻底唤醒！这根本不是起死回生，而是一张慢速死刑判决书！强尼的人格正在像纳米病毒一样疯狂覆写V的神经元，留给V的时间只剩几个星期！两人从互相掐脖子咒骂，到为了活下去被迫绑在一条战船上！"</p>
+            </div>
+            <div class="csc-grid">
+              
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(252, 238, 10, 0.16); color: #fcee0a;">【死而复生】</span>
+                <h4 class="c-title">Relic生物芯片死机修复</h4>
+                <ul class="c-bullets">
+                  <li>微型纳米机器人修复脑干损伤，强行重启生命体征</li><li>但代价是：植入脑中的强尼·银手意识被全面激活</li>
+                </ul>
+              </div>
+            
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(255, 0, 60, 0.16); color: #ff003c;">【人格蚕食】</span>
+                <h4 class="c-title">不可逆转的神经覆写</h4>
+                <ul class="c-bullets">
+                  <li>强尼的人格正在像病毒般溶解消灭V的原生意识</li><li>吐血、眩晕、机能衰竭，死亡倒计时只剩短短数周</li>
+                </ul>
+              </div>
+            
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(0, 240, 255, 0.16); color: #00f0ff;">【双魂同舟】</span>
+                <h4 class="c-title">从拔枪相向到亦师亦友</h4>
+                <ul class="c-bullets">
+                  <li>从最初的抢夺身体控制权，到达成默契绝地反扑</li><li>为了活下去，唯一的生路就是杀入荒坂地下神舆！</li>
+                </ul>
+              </div>
+            
+            </div>
+          </div>
+        
+          <div class="causal-scene-card" id="scene-card-4">
+            <div class="csc-header">
+              <div class="csc-meta">
+                <span class="csc-step">STAGE 04</span>
+                <span class="csc-time-tag">01:48</span>
+              </div>
+              <h3 class="csc-title">突破高墙 · 游荡恶土与黑墙奥特</h3>
+              <p class="csc-narration">"为了自救，V踏遍了夜之城的三教九流！联手朱迪追查云顶，求助流浪者帕南用EMP干下荒坂浮空车抓捕赫尔曼，再跟着竹村密谋揭穿赖宣的谎言！最终的线索指向了赛博空间的绝对禁区——黑墙之外！强尼的前女友奥特·坎宁安已经进化成了神级AI，她给出了唯一的药方：杀入荒坂塔地下的数据殿堂“神舆”，用奥特的代码把V和强尼的意识彻底剥离！"</p>
+            </div>
+            <div class="csc-grid">
+              
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(0, 240, 255, 0.16); color: #00f0ff;">【踏平夜城】</span>
+                <h4 class="c-title">结识生死与共的真挚盟友</h4>
+                <ul class="c-bullets">
+                  <li>与恶土流浪者阿德卡多家族结下生死兄弟情义</li><li>携手竹村调查荒坂游行，一步步逼近核心机密</li>
+                </ul>
+              </div>
+            
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(252, 238, 10, 0.16); color: #fcee0a;">【接触神明】</span>
+                <h4 class="c-title">突破赛博禁区连线奥特</h4>
+                <ul class="c-bullets">
+                  <li>借助巫毒帮潜入深网，跨越黑墙联络AI奥特</li><li>得知Relic核心解法：唯有神舆才能剥离双重意识</li>
+                </ul>
+              </div>
+            
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(255, 0, 60, 0.16); color: #ff003c;">【决战倒计时】</span>
+                <h4 class="c-title">夜之城最后的狂风暴雨</h4>
+                <ul class="c-bullets">
+                  <li>常规医疗宣告无效，身体机能逼近崩溃奇点</li><li>吹响总攻号角，准备向荒坂塔发起自杀式突袭！</li>
+                </ul>
+              </div>
+            
+            </div>
+          </div>
+        
+          <div class="causal-scene-card" id="scene-card-5">
+            <div class="csc-header">
+              <div class="csc-meta">
+                <span class="csc-step">STAGE 05</span>
+                <span class="csc-time-tag">02:22</span>
+              </div>
+              <h3 class="csc-title">巅峰决战 · 杀穿荒坂塔与手刃重锤</h3>
+              <p class="csc-narration">"决战爆发！无论是呼叫阿德卡多开着魔蜥坦克正面硬冲，还是听从强尼建议单枪匹马杀穿大堂，V都已经化身夜之城不可阻挡的死神！在荒坂塔最深处，横亘在神舆大门前的，是企业的终极看门恶犬——冷血屠夫亚当·重锤！这一战不仅是为了自救，更是为了给杰克、大卫以及无数死在重锤手下的佣兵复仇！枪林弹雨中，V亲手将重锤轰成一堆冒烟的废铁！"</p>
+            </div>
+            <div class="csc-grid">
+              
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(252, 238, 10, 0.16); color: #fcee0a;">【杀入心脏】</span>
+                <h4 class="c-title">单刀直入荒坂大厦核心</h4>
+                <ul class="c-bullets">
+                  <li>直面全副武装的荒坂精英卫队，弹雨洗礼无可阻挡</li><li>将企业的神圣大厦踩在脚下，直抵地下神舆数据核心</li>
+                </ul>
+              </div>
+            
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(255, 0, 60, 0.16); color: #ff003c;">【传奇决斗】</span>
+                <h4 class="c-title">死斗企业噩梦亚当重锤</h4>
+                <ul class="c-bullets">
+                  <li>96%全身重装机械改造、手握重炮的冷血战争机器</li><li>不仅是实力对决，更是自由意志对企业极权的终极清算</li>
+                </ul>
+              </div>
+            
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(0, 240, 255, 0.16); color: #00f0ff;">【手刃恶犬】</span>
+                <h4 class="c-title">彻底摧毁杀手神话</h4>
+                <ul class="c-bullets">
+                  <li>轰碎重锤机械核心，替杰克与夜之城亡灵血洗前仇</li><li>推开通往意识虚空的大门，踏入冰冷的神舆赛博空间</li>
+                </ul>
+              </div>
+            
+            </div>
+          </div>
+        
+          <div class="causal-scene-card" id="scene-card-6">
+            <div class="csc-header">
+              <div class="csc-meta">
+                <span class="csc-step">STAGE 06</span>
+                <span class="csc-time-tag">02:58</span>
+              </div>
+              <h3 class="csc-title">终局抉择 · 神舆赛博空间与传奇谢幕</h3>
+              <p class="csc-narration">"然而神舆里的真相残酷得令人窒息！奥特剥离了强尼，但V的身体细胞已经被Relic彻底改写成强尼的DNA，即便留下来，也只剩六个月生命！两个灵魂坐在数据的红天白桥上平静作别：强尼选择随奥特进入黑墙深空，将生的希望留给挚友；而V重新睁开眼，要么作为夜之城真正的活传奇登上太空站豪赌最后一战，要么与帕南驰骋在恶土的星空下！在这个没有活着的传奇的城市里，V活出了最烈的人性光芒！"</p>
+            </div>
+            <div class="csc-grid">
+              
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(255, 0, 60, 0.16); color: #ff003c;">【残酷真相】</span>
+                <h4 class="c-title">肉体DNA已被彻底改写</h4>
+                <ul class="c-bullets">
+                  <li>奥特冷酷宣判：身体已不容V的原生灵魂</li><li>即便重回肉身，免疫崩溃也只留给V最后六个月寿命</li>
+                </ul>
+              </div>
+            
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(0, 240, 255, 0.16); color: #00f0ff;">【灵魂告别】</span>
+                <h4 class="c-title">红天白桥上的真挚释怀</h4>
+                <ul class="c-bullets">
+                  <li>强尼放弃抢占肉身，选择与奥特步入浩瀚黑墙数据流</li><li>将最后的呼吸与自由，完整归还给这个年轻的搭档</li>
+                </ul>
+              </div>
+            
+              <div class="causal-box">
+                <span class="c-pill" style="background: rgba(252, 238, 10, 0.16); color: #fcee0a;">【传奇不朽】</span>
+                <h4 class="c-title">向死而生的绚烂破晓</h4>
+                <ul class="c-bullets">
+                  <li>与阿德卡多翻越边境追寻希望，或踏上水晶宫终极挑战</li><li>夜之城没有活着的传奇，但V的名字永远镌刻在星空！</li>
+                </ul>
+              </div>
+            
+            </div>
+          </div>
+        
+    </div>
+
+    <!-- Section 2: Character Dossier -->
+    <h2 class="section-title">关键人物与核心场景档案</h2>
+    <div class="char-grid">
+      
+          <div class="char-card">
+            <div class="char-img-wrap">
+              <img src="assets/images/scene01_v.jpg" alt="雇佣兵 V" class="char-img" />
+              <div class="char-badge" style="border-color: #fcee0a; color: #fcee0a;">夜之城传奇</div>
+            </div>
+            <div class="char-body">
+              <h4 class="char-name">雇佣兵 V</h4>
+              <p class="char-desc">向死而生的底层佣兵，在巨型企业的钢铁丛林中撞击命运。</p>
+            </div>
+          </div>
+        
+          <div class="char-card">
+            <div class="char-img-wrap">
+              <img src="assets/images/scene02_jackie.jpg" alt="杰克·威尔斯" class="char-img" />
+              <div class="char-badge" style="border-color: #fcee0a; color: #fcee0a;">一生兄弟</div>
+            </div>
+            <div class="char-body">
+              <h4 class="char-name">杰克·威尔斯</h4>
+              <p class="char-desc">海伍德最重情义的硬汉，倒在德拉曼出租车的后座血泊中。</p>
+            </div>
+          </div>
+        
+          <div class="char-card">
+            <div class="char-img-wrap">
+              <img src="assets/images/scene03_johnny.jpg" alt="强尼·银手" class="char-img" />
+              <div class="char-badge" style="border-color: #fcee0a; color: #fcee0a;">摇滚叛徒</div>
+            </div>
+            <div class="char-body">
+              <h4 class="char-name">强尼·银手</h4>
+              <p class="char-desc">五十年前炸毁荒坂塔的传奇乐手，意识被困在Relic芯片之中。</p>
+            </div>
+          </div>
+        
+          <div class="char-card">
+            <div class="char-img-wrap">
+              <img src="assets/images/scene01_v.jpg" alt="流浪者 帕南 & 奥特" class="char-img" />
+              <div class="char-badge" style="border-color: #fcee0a; color: #fcee0a;">盟友与黑客</div>
+            </div>
+            <div class="char-body">
+              <h4 class="char-name">流浪者 帕南 & 奥特</h4>
+              <p class="char-desc">恶土阿德卡多的越野重机枪，与黑墙之外化身神明的超强AI。</p>
+            </div>
+          </div>
+        
+          <div class="char-card">
+            <div class="char-img-wrap">
+              <img src="assets/images/scene05_smasher.jpg" alt="亚当·重锤" class="char-img" />
+              <div class="char-badge" style="border-color: #fcee0a; color: #fcee0a;">荒坂最终兵器</div>
+            </div>
+            <div class="char-body">
+              <h4 class="char-name">亚当·重锤</h4>
+              <p class="char-desc">百分之九十六义体化的冷血怪物，夜之城无数佣兵的噩梦终结者。</p>
+            </div>
+          </div>
+        
+          <div class="char-card">
+            <div class="char-img-wrap">
+              <img src="assets/images/scene06_mikoshi.jpg" alt="神舆赛博空间" class="char-img" />
+              <div class="char-badge" style="border-color: #fcee0a; color: #fcee0a;">灵魂终站</div>
+            </div>
+            <div class="char-body">
+              <h4 class="char-name">神舆赛博空间</h4>
+              <p class="char-desc">储存千万灵魂的数据熔炉，夜之城传奇向死而生的最终抉择点。</p>
+            </div>
+          </div>
+        
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>Hyperframe Video & Visual Knowledge Lab · 基于因果逻辑与高阶视觉合成构建</p>
+  </footer>
+
+  <script>
+    const video = document.getElementById('mainVideo');
+    const timestamps = [0.0, 36.44, 73.43, 108.60000000000001, 142.69, 178.26999999999998];
+    const sceneTitles = ["\u5e95\u8272\u4e0e\u524d\u56e0 \u00b7 \u5de8\u4f01\u7ede\u8089\u673a\u4e0e\u626c\u540d\u7acb\u4e07", "\u8f6c\u6298\u5927\u52ab\u6848 \u00b7 \u7ec0\u78a7\u5927\u53a6\u4e0e\u8840\u6cca\u7a81\u56f4", "\u751f\u6b7b\u5371\u673a \u00b7 \u5f3a\u5c3c\u94f6\u624b\u4e0e\u795e\u7ecf\u8986\u5199", "\u7a81\u7834\u9ad8\u5899 \u00b7 \u6e38\u8361\u6076\u571f\u4e0e\u9ed1\u5899\u5965\u7279", "\u5dc5\u5cf0\u51b3\u6218 \u00b7 \u6740\u7a7f\u8352\u5742\u5854\u4e0e\u624b\u5203\u91cd\u9524", "\u7ec8\u5c40\u6289\u62e9 \u00b7 \u795e\u8206\u8d5b\u535a\u7a7a\u95f4\u4e0e\u4f20\u5947\u8c22\u5e55"];
+
+    function jumpToChapter(seconds, idx) {
+      video.currentTime = seconds;
+      video.play();
+      updateChapterUI(idx - 1);
+    }
+
+    function setSpeed(speed, btn) {
+      video.playbackRate = speed;
+      document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    function updateChapterUI(idx) {
+      document.getElementById('curChapterName').innerText = sceneTitles[idx];
+      document.querySelectorAll('.timeline-nav-card').forEach((c, i) => {
+        if (i === idx) c.classList.add('active');
+        else c.classList.remove('active');
+      });
+    }
+
+    video.addEventListener('timeupdate', () => {
+      const t = video.currentTime;
+      let activeIdx = 0;
+      for (let i = 0; i < timestamps.length; i++) {
+        if (t >= timestamps[i]) activeIdx = i;
+      }
+      updateChapterUI(activeIdx);
+    });
+  </script>
+</body>
+</html>
