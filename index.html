@@ -127,6 +127,66 @@
       height: 100%;
       object-fit: contain;
     }
+    .video-loading-hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #f1f5f9;
+      font-size: 14px;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    .loading-spin {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .player-aux-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background: rgba(10, 15, 24, 0.85);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+      color: #94a3b8;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .stream-tip { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+    .stream-actions { display: flex; gap: 10px; }
+    .aux-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      color: #f1f5f9;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: all 0.2s;
+    }
+    .aux-btn:hover {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+    }
     .player-quickbar {
       display: flex;
       justify-content: space-between;
@@ -372,10 +432,14 @@
     <!-- Cinema Video Box -->
     <div class="video-box">
       <div class="video-wrapper">
-        <video id="mainVideo" controls poster="assets/images/hero_v.jpg">
-          <source src="cyberpunk-2077_lore.mp4" type="video/mp4">
+        <video id="mainVideo" controls playsinline webkit-playsinline preload="metadata" poster="assets/images/hero_v.jpg">
+          <source src="cyberpunk_2077_lore.mp4" type="video/mp4">
           您的浏览器暂不支持 HTML5 视频播放。
         </video>
+        <div id="videoLoadingHint" class="video-loading-hint" style="display:none;">
+          <div class="loading-spin"></div>
+          <span id="loadingHintText">视频缓冲中，请稍候...</span>
+        </div>
       </div>
       <div class="player-quickbar">
         <div class="current-chapter-display">
@@ -386,6 +450,21 @@
           <button class="speed-btn active" onclick="setSpeed(1.0, this)">1.0x</button>
           <button class="speed-btn" onclick="setSpeed(1.25, this)">1.25x</button>
           <button class="speed-btn" onclick="setSpeed(1.5, this)">1.5x</button>
+        </div>
+      </div>
+      <div class="player-aux-bar">
+        <div class="stream-tip">
+          <span>⚡ 1080P 超清 Web 串流优化已生效 (FastStart 零等待即开即看)</span>
+        </div>
+        <div class="stream-actions">
+          <a href="cyberpunk_2077_lore.mp4" target="_blank" class="aux-btn">
+            <span>在新窗口打开视频</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          </a>
+          <a href="cyberpunk_2077_lore.mp4" download="cyberpunk_2077_lore.mp4" class="aux-btn">
+            <span>下载原片 MP4</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          </a>
         </div>
       </div>
     </div>
@@ -756,12 +835,40 @@
 
   <script>
     const video = document.getElementById('mainVideo');
-    const timestamps = [0.0, 36.44, 73.43, 108.60000000000001, 142.69, 178.26999999999998];
-    const sceneTitles = ["\u5e95\u8272\u4e0e\u524d\u56e0 \u00b7 \u5de8\u4f01\u7ede\u8089\u673a\u4e0e\u626c\u540d\u7acb\u4e07", "\u8f6c\u6298\u5927\u52ab\u6848 \u00b7 \u7ec0\u78a7\u5927\u53a6\u4e0e\u8840\u6cca\u7a81\u56f4", "\u751f\u6b7b\u5371\u673a \u00b7 \u5f3a\u5c3c\u94f6\u624b\u4e0e\u795e\u7ecf\u8986\u5199", "\u7a81\u7834\u9ad8\u5899 \u00b7 \u6e38\u8361\u6076\u571f\u4e0e\u9ed1\u5899\u5965\u7279", "\u5dc5\u5cf0\u51b3\u6218 \u00b7 \u6740\u7a7f\u8352\u5742\u5854\u4e0e\u624b\u5203\u91cd\u9524", "\u7ec8\u5c40\u6289\u62e9 \u00b7 \u795e\u8206\u8d5b\u535a\u7a7a\u95f4\u4e0e\u4f20\u5947\u8c22\u5e55"];
+    const loadingHint = document.getElementById('videoLoadingHint');
+    const loadingText = document.getElementById('loadingHintText');
+    const timestamps = [0.0, 36.44, 73.43, 108.6, 142.69, 178.27];
+    const sceneTitles = [
+      "底色与前因 · 巨企绞肉机与扬名立万",
+      "转折大劫案 · 绀碧大厦与血泊突围",
+      "生死危机 · 强尼银手与神经覆写",
+      "突破高墙 · 游荡恶土与黑墙奥特",
+      "巅峰决战 · 杀穿荒坂塔与手刃重锤",
+      "终局抉择 · 神舆赛博空间与传奇谢幕"
+    ];
+
+    if (loadingHint) {
+      video.addEventListener('waiting', () => {
+        if (loadingText) loadingText.innerText = '视频缓冲中，请稍候...';
+        loadingHint.style.display = 'flex';
+      });
+      video.addEventListener('canplay', () => {
+        loadingHint.style.display = 'none';
+      });
+      video.addEventListener('playing', () => {
+        loadingHint.style.display = 'none';
+      });
+      video.addEventListener('error', () => {
+        loadingHint.style.display = 'flex';
+        if (loadingText) {
+          loadingText.innerHTML = '<span style="color:#f87171;">⚠️ 视频加载较慢，建议点击下方【在新窗口打开视频】或【下载原片】直接观看</span>';
+        }
+      });
+    }
 
     function jumpToChapter(seconds, idx) {
       video.currentTime = seconds;
-      video.play();
+      video.play().catch(e => console.warn('Autoplay restricted or loading:', e));
       updateChapterUI(idx - 1);
     }
 
