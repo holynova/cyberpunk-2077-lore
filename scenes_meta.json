@@ -4,7 +4,7 @@
   "scenes": [
     {
       "id": "scene-01",
-      "title": "底色与前因 · 巨企绞肉机与扬名立万",
+      "title": "底色与前因——巨企绞肉机与扬名立万",
       "eyebrow": "TIMELINE 01 / THE NIGHT CITY MEATGRINDER",
       "image": "assets/images/scene01_v.jpg",
       "char_name": "雇佣兵 V",
@@ -43,7 +43,7 @@
     },
     {
       "id": "scene-02",
-      "title": "转折大劫案 · 绀碧大厦与血泊突围",
+      "title": "转折大劫案——绀碧大厦与血泊突围",
       "eyebrow": "TIMELINE 02 / THE HEIST AT KONPEKI PLAZA",
       "image": "assets/images/scene02_jackie.jpg",
       "char_name": "杰克·威尔斯",
@@ -82,7 +82,7 @@
     },
     {
       "id": "scene-03",
-      "title": "生死危机 · 强尼银手与神经覆写",
+      "title": "生死危机——强尼银手与神经覆写",
       "eyebrow": "TIMELINE 03 / JOHNNY SILVERHAND & RELIC",
       "image": "assets/images/scene03_johnny.jpg",
       "char_name": "强尼·银手",
@@ -121,7 +121,7 @@
     },
     {
       "id": "scene-04",
-      "title": "突破高墙 · 游荡恶土与黑墙奥特",
+      "title": "突破高墙——游荡恶土与黑墙奥特",
       "eyebrow": "TIMELINE 04 / BEYOND THE BLACKWALL",
       "image": "assets/images/scene01_v.jpg",
       "char_name": "流浪者 帕南 & 奥特",
@@ -160,7 +160,7 @@
     },
     {
       "id": "scene-05",
-      "title": "巅峰决战 · 杀穿荒坂塔与手刃重锤",
+      "title": "巅峰决战——杀穿荒坂塔与手刃重锤",
       "eyebrow": "TIMELINE 05 / STORMING ARASAKA TOWER",
       "image": "assets/images/scene05_smasher.jpg",
       "char_name": "亚当·重锤",
@@ -199,7 +199,7 @@
     },
     {
       "id": "scene-06",
-      "title": "终局抉择 · 神舆赛博空间与传奇谢幕",
+      "title": "终局抉择——神舆赛博空间与传奇谢幕",
       "eyebrow": "TIMELINE 06 / MIKOSHI & THE LEGEND",
       "image": "assets/images/scene06_mikoshi.jpg",
       "char_name": "神舆赛博空间",
